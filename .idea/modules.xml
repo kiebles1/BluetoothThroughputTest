@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/BluetoothThrougputTest.iml" filepath="$PROJECT_DIR$/BluetoothThrougputTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/BluetoothThroughputTest.iml" filepath="$PROJECT_DIR$/BluetoothThroughputTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

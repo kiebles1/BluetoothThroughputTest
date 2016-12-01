@@ -15,6 +15,7 @@ public class BluetoothManager {
 
     private BluetoothAdapter mBtAdapter;
     private Set<BluetoothDevice> mBtDevices;
+    private boolean mIsMaster;
 
     public BluetoothManager(BluetoothAdapter pBtAdapter) {
 
@@ -24,6 +25,18 @@ public class BluetoothManager {
         QueryPairedDevices();
     }
 
+    public void SetMasterOrSlave(boolean pIsMaster) {
+        mIsMaster = pIsMaster;
+    }
+
+    public Set<BluetoothDevice> GetPairedDevices() {
+        if(mBtDevices.size() == 0) {
+            QueryPairedDevices();
+        }
+        return mBtDevices;
+    }
+
+    //PRIVATE:
     private void QueryPairedDevices() {
 
         //Get set (no repeats, max 1 null value) of paired devices

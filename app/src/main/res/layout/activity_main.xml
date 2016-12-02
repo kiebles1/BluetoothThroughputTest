@@ -23,10 +23,11 @@
 
             <RadioGroup
                 android:layout_width="135dp"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:checkedButton="@+id/radioButton1">
 
                 <RadioButton
-                    android:text="@string/master_radio"
+                    android:text="@string/server_radio"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/radioButton1"
@@ -34,18 +35,13 @@
                     android:onClick="onRadioButton"/>
 
                 <RadioButton
-                    android:text="@string/slave_radio"
+                    android:text="@string/client_radio"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/radioButton2"
                     android:layout_weight="1"
                     android:onClick="onRadioButton"/>
             </RadioGroup>
-
-            <!--<Space-->
-                <!--android:layout_width="0dp"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_weight="1" />-->
 
             <LinearLayout
                 android:orientation="vertical"
@@ -57,14 +53,15 @@
                     android:text="@string/paired_devices_button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/pairView"
+                    android:id="@+id/pair_button"
                     android:onClick="onButtonClick"/>
 
                 <Button
                     android:text="@string/connection_button"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/button2" />
+                    android:id="@+id/connection_button"
+                    android:onClick="onButtonClick"/>
             </LinearLayout>
         </RelativeLayout>
 

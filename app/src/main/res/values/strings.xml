@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">BluetoothThroughputTest</string>
+    <string name="paired_devices_button">Update Paired Devices</string>
+    <string name="master_radio">I am the master</string>
+    <string name="slave_radio">I am a slave</string>
+    <string name="connection_button">Establish Bluetooth channel</string>
+    <string name="console_string">Console</string>
 </resources>

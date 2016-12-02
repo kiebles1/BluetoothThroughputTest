@@ -7,17 +7,17 @@ import android.content.Intent;
 
 import java.util.Set;
 
-/**
+/*
  * Created by Steven on 12/1/2016.
  */
 
-public class BluetoothManager {
+class BluetoothManager {
 
     private BluetoothAdapter mBtAdapter;
     private Set<BluetoothDevice> mBtDevices;
     private boolean mIsMaster;
 
-    public BluetoothManager(BluetoothAdapter pBtAdapter) {
+    BluetoothManager(BluetoothAdapter pBtAdapter) {
 
         //Save bluetooth adapter as class member
         mBtAdapter = pBtAdapter;
@@ -25,11 +25,11 @@ public class BluetoothManager {
         QueryPairedDevices();
     }
 
-    public void SetMasterOrSlave(boolean pIsMaster) {
+    void SetMasterOrSlave(boolean pIsMaster) {
         mIsMaster = pIsMaster;
     }
 
-    public Set<BluetoothDevice> GetPairedDevices() {
+    Set<BluetoothDevice> GetPairedDevices() {
         if(mBtDevices.size() == 0) {
             QueryPairedDevices();
         }

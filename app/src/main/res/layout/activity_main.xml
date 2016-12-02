@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
@@ -9,47 +9,68 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:orientation="vertical"
+    android:layout_alignParentTop="true"
+    android:layout_alignParentStart="true"
+    android:weightSum="1">
 
-    <RadioGroup
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" >
+        <RelativeLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
 
-        <RadioButton
-            android:text="I'm the master"
-            android:layout_width="wrap_content"
+            <RadioGroup
+                android:layout_width="135dp"
+                android:layout_height="wrap_content">
+
+                <RadioButton
+                    android:text="@string/master_radio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/radioButton1"
+                    android:layout_weight="1"
+                    android:onClick="onRadioButton"/>
+
+                <RadioButton
+                    android:text="@string/slave_radio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/radioButton2"
+                    android:layout_weight="1"
+                    android:onClick="onRadioButton"/>
+            </RadioGroup>
+
+            <!--<Space-->
+                <!--android:layout_width="0dp"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_weight="1" />-->
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="175dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true">
+
+                <Button
+                    android:text="@string/paired_devices_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/pairView"
+                    android:onClick="onButtonClick"/>
+
+                <Button
+                    android:text="@string/connection_button"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/button2" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <TextView
+            android:text="@string/console_string"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/radioButton1"
-            android:layout_weight="1"
-            android:onClick="onRadioButton"/>
-
-        <RadioButton
-            android:text="I'm a slave"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/radioButton2"
-            android:layout_weight="1"
-            android:onClick="onRadioButton"/>
-    </RadioGroup>
-
-    <TextView
-        android:text="TextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:id="@+id/androidConsoleTV"
-        android:layout_alignParentEnd="true"
-        android:textSize="20sp" />
-
-    <Button
-        android:text="Button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:id="@+id/pairView"
-        android:onClick="onButtonClick" />
-</RelativeLayout>
+            android:id="@+id/androidConsoleTV" />
+</LinearLayout>

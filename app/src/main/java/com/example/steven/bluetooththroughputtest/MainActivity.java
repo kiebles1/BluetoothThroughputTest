@@ -35,8 +35,9 @@ public class MainActivity extends AppCompatActivity {
         if (!lBluetoothAdapter.isEnabled()) {
             Intent enableBluetooth = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBluetooth, BLUETOOTH_REQUEST_CODE);
-            ((RadioButton) findViewById(R.id.radioButton1)).setEnabled(false);
-            ((RadioButton) findViewById(R.id.radioButton2)).setEnabled(false);
+            findViewById(R.id.radioButton1).setEnabled(false);
+            findViewById(R.id.radioButton2).setEnabled(false);
+            findViewById(R.id.pairView).setEnabled(false);
         }
 
         mBtManager = new BluetoothManager(lBluetoothAdapter);
@@ -52,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
                 String lPairedDeviceNames = "";
                 if(lPairedDeviceSet.size() > 0) {
                     for (BluetoothDevice device : lPairedDeviceSet) {
-                        lPairedDeviceNames = lPairedDeviceNames.concat(device.getName());
+                        lPairedDeviceNames = lPairedDeviceNames.concat(device.getName() + "\n");
                     }
                 }
                 else {
@@ -83,8 +84,9 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == BLUETOOTH_REQUEST_CODE) {
             if(resultCode == RESULT_OK) {
-                ((RadioButton) findViewById(R.id.radioButton1)).setEnabled(true);
-                ((RadioButton) findViewById(R.id.radioButton2)).setEnabled(true);
+                findViewById(R.id.radioButton1).setEnabled(true);
+                findViewById(R.id.radioButton2).setEnabled(true);
+                findViewById(R.id.pairView).setEnabled(true);
             }
         }
     }

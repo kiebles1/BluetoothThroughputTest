@@ -6,10 +6,13 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
+import android.os.Handler;
 import android.util.Log;
 
 import java.io.IOException;
 import java.util.Set;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.UUID;
 
 /*
@@ -139,9 +142,116 @@ class BluetoothManager {
 
     private class ConnectThread extends Thread {
 
+        private final BluetoothSocket mmSocket;
+        private final BluetoothDevice mmDevice;
+
         ConnectThread(BluetoothDevice pServerDevice) {
-            //TODO: Create process to connect client to server
+
             //Server device should come from list of paired devices. See https://developer.android.com/guide/topics/connectivity/bluetooth.html#ConnectingDevices for help
+
+            BluetoothSocket tmp = null;
+            mmDevice = pServerDevice;
+
+            // Get a BluetoothSocket to connect with the given BluetoothDevice
+            try {
+                // MY_UUID is the app's UUID string, also used by the server code
+                tmp = mmDevice.createRfcommSocketToServiceRecord(MY_UUID);
+            } catch (IOException e) { }
+            mmSocket = tmp;
+        }
+
+        public void run() {
+            // Cancel discovery because it will slow down the connection
+            mBtAdapter.cancelDiscovery();
+
+            try {
+                // Connect the device through the socket. This will block
+                // until it succeeds or throws an exception
+                mmSocket.connect();
+            } catch (IOException connectException) {
+                // Unable to connect; close the socket and get out
+                try {
+                    mmSocket.close();
+                } catch (IOException closeException) { }
+                return;
+            }
+
+            // Do work to manage the connection (in a separate thread)
+            //TODO: Create process to manage the connection
+            manageConnectedSocket();
+        }
+
+        /** Will cancel an in-progress connection, and close the socket */
+        public void cancel() {
+            try {
+                mmSocket.close();
+            } catch (IOException e) { }
+        }
+
+        void manageConnectedSocket() {
+            ConnectedThread lConnectedThread = new ConnectedThread(mmSocket);
+            //TODO: manage connection
+
+        }
+    }
+
+    private class ConnectedThread extends Thread {
+        private final BluetoothSocket mmSocket;
+        private final InputStream mmInStream;
+        private final OutputStream mmOutStream;
+        private Handler mHandler;
+
+        public ConnectedThread(BluetoothSocket socket) {
+            mmSocket = socket;
+            mHandler = new Handler();
+            InputStream tmpIn = null;
+            OutputStream tmpOut = null;
+
+            // Get the input and output streams, using temp objects because
+            // member streams are final
+            try {
+                tmpIn = socket.getInputStream();
+                tmpOut = socket.getOutputStream();
+            } catch (IOException e) { }
+
+            mmInStream = tmpIn;
+            mmOutStream = tmpOut;
+        }
+
+        public void run() {
+            byte[] buffer = new byte[1024];  // buffer store for the stream
+            int bytes; // bytes returned from read()
+
+            // Keep listening to the InputStream until an exception occurs
+            while (true) {
+                try {
+                    // Read from the InputStream
+                    bytes = mmInStream.read(buffer);
+                    // Send the obtained bytes to the UI activity
+                    //TODO: Figure out how to pass information to main activity. Define handler and Main Activiity might need to implement Handler.handleMessage()
+                    //http://stackoverflow.com/questions/24837548/how-to-write-a-correct-handler-with-obtainmessage
+                    //In this case, 1 is an arbitrary value taht indicates a message was successfully read
+                    //Also this could be useful too: https://github.com/googlesamples/android-BluetoothChat/blob/master/Application/src/main/java/com/example/android/bluetoothchat/BluetoothChatService.java
+                    mHandler.obtainMessage(1, bytes, -1, buffer)
+                            .sendToTarget();
+                } catch (IOException e) {
+                    break;
+                }
+            }
+        }
+
+        /* Call this from the main activity to send data to the remote device */
+        public void write(byte[] bytes) {
+            try {
+                mmOutStream.write(bytes);
+            } catch (IOException e) { }
+        }
+
+        /* Call this from the main activity to shutdown the connection */
+        public void cancel() {
+            try {
+                mmSocket.close();
+            } catch (IOException e) { }
         }
     }
 

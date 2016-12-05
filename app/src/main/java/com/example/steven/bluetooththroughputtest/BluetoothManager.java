@@ -72,8 +72,8 @@ class BluetoothManager {
     public void manageConnectedSocket(BluetoothSocket socket, BluetoothDevice
             device) {
 
-        //ConnectedThread lConnectedThread = new ConnectedThread(socket);
-        //lConnectedThread.start();
+        ConnectedThread lConnectedThread = new ConnectedThread(socket);
+        lConnectedThread.run();
         //TODO: manage connection
 
 

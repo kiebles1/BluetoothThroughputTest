@@ -56,7 +56,7 @@ class BluetoothManager {
 
         if(mIsServer) {
             AcceptThread lAcceptThread = new AcceptThread();
-            lAcceptThread.run();
+            lAcceptThread.start();
         }
         else {
 
@@ -64,7 +64,7 @@ class BluetoothManager {
 
             for (BluetoothDevice device : mBtDevices) {
                 ConnectThread lConnectThread = new ConnectThread(device);
-                lConnectThread.run();
+                lConnectThread.start();
             }
 
         }
@@ -249,9 +249,9 @@ class BluetoothManager {
                         bytes = mmInStream.read(buffer);
 
                         Bundle lBundle = new Bundle();
-                        lBundle.putString("Device Name", mmSocket.getRemoteDevice().getName());
+                        lBundle.putString("Device Name", new String(buffer));
 
-                        Message msg = mHandler.obtainMessage(1, bytes, -1, buffer);
+                        Message msg = mHandler.obtainMessage(1);
                         msg.setData(lBundle);
                         msg.sendToTarget();
                     } catch (IOException e) {

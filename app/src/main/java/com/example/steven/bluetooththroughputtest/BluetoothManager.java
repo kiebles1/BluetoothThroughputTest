@@ -6,7 +6,9 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
+import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 import java.io.IOException;
@@ -74,8 +76,16 @@ class BluetoothManager {
 
         ConnectedThread lConnectedThread = new ConnectedThread(socket);
         lConnectedThread.run();
+        //ConnectedThread lConnectedThread = new ConnectedThread(socket);
+        //lConnectedThread.write();
+        //lConnectedThread.start();
         //TODO: manage connection
 
+
+    }
+
+    //TODO: finish this function too
+    public void manageConnectedWrite(BluetoothSocket socket, BluetoothDevice device) {
 
     }
 
@@ -132,6 +142,19 @@ class BluetoothManager {
 
                     Log.d("BluetoothThroughputTest", socket.getRemoteDevice().getName());
 
+                    byte[] buffer = new byte[1024];
+                    int bytes = 149;
+
+
+                    Bundle lBundle = new Bundle();
+                    lBundle.putString("Device Name",socket.getRemoteDevice().getName());
+
+                    Message msg = mHandler.obtainMessage(1);
+                    msg.setData(lBundle);
+                    msg.sendToTarget();
+
+                    //Add in call to a function that creates a connectedthread
+                    //manageConnectedWrite(mSocket, mDevice);
                     try {
                         mServerSocket.close();
                     } catch (IOException e) {
@@ -189,9 +212,6 @@ class BluetoothManager {
                 return;
             }
 
-
-            // Do work to manage the connection (in a separate thread)
-            //TODO: Create process to manage the connection
             manageConnectedSocket(mSocket, mDevice);
         }
 

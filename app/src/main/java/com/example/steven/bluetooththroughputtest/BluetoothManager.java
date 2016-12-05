@@ -27,7 +27,7 @@ class BluetoothManager {
 
     private BluetoothAdapter mBtAdapter;
     private Set<BluetoothDevice> mBtDevices;
-    private boolean mIsServer;
+    private boolean mIsServer = true;
     private Handler mHandler;
 
     BluetoothManager(BluetoothAdapter pBtAdapter, Handler pHandler) {
@@ -58,8 +58,11 @@ class BluetoothManager {
         }
         else {
 
+            Log.d("BluetoothThroughputTest", "Client Mode");
+
             for (BluetoothDevice device : mBtDevices) {
                 ConnectThread lConnectThread = new ConnectThread(device);
+                lConnectThread.run();
             }
 
         }

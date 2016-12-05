@@ -74,8 +74,8 @@ class BluetoothManager {
     public void manageConnectedSocket(BluetoothSocket socket, BluetoothDevice
             device) {
 
-        ConnectedThread lConnectedThread = new ConnectedThread(socket);
-        lConnectedThread.run();
+        ConnectedThread lConnectedThread = new ConnectedThread(socket, 0);
+        lConnectedThread.start();
         //ConnectedThread lConnectedThread = new ConnectedThread(socket);
         //lConnectedThread.write();
         //lConnectedThread.start();
@@ -85,8 +85,9 @@ class BluetoothManager {
     }
 
     //TODO: finish this function too
-    public void manageConnectedWrite(BluetoothSocket socket, BluetoothDevice device) {
-
+    public void manageConnectedWrite(BluetoothSocket socket) {
+        ConnectedThread lConnectedThread = new ConnectedThread(socket, 1);
+        lConnectedThread.start();
     }
 
     //PRIVATE:
@@ -142,17 +143,7 @@ class BluetoothManager {
 
                     Log.d("BluetoothThroughputTest", socket.getRemoteDevice().getName());
 
-                    byte[] buffer = new byte[1024];
-                    int bytes = 149;
-
-
-                    Bundle lBundle = new Bundle();
-                    lBundle.putString("Device Name",socket.getRemoteDevice().getName());
-
-                    Message msg = mHandler.obtainMessage(1);
-                    msg.setData(lBundle);
-                    msg.sendToTarget();
-
+                    manageConnectedWrite(socket);
                     //Add in call to a function that creates a connectedthread
                     //manageConnectedWrite(mSocket, mDevice);
                     try {
@@ -227,9 +218,11 @@ class BluetoothManager {
         private final BluetoothSocket mmSocket;
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
+        private final int mType; //0 means read, 1 means write
 
-        public ConnectedThread(BluetoothSocket socket) {
+        public ConnectedThread(BluetoothSocket socket, int type) {
             mmSocket = socket;
+            mType = type;
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
 
@@ -245,24 +238,30 @@ class BluetoothManager {
         }
 
         public void run() {
-            byte[] buffer = new byte[1024];  // buffer store for the stream
-            int bytes; // bytes returned from read()
+            if (mType == 0) {
+                byte[] buffer = new byte[1024];  // buffer store for the stream
+                int bytes; // bytes returned from read()
 
-            // Keep listening to the InputStream until an exception occurs
-            while (true) {
-                try {
-                    // Read from the InputStream
-                    bytes = mmInStream.read(buffer);
-                    // Send the obtained bytes to the UI activity
-                    //TODO: Figure out how to pass information to main activity. Define handler and Main Activiity might need to implement Handler.handleMessage()
-                    //http://stackoverflow.com/questions/24837548/how-to-write-a-correct-handler-with-obtainmessage
-                    //In this case, 1 is an arbitrary value taht indicates a message was successfully read
-                    //Also this could be useful too: https://github.com/googlesamples/android-BluetoothChat/blob/master/Application/src/main/java/com/example/android/bluetoothchat/BluetoothChatService.java
-                    mHandler.obtainMessage(1, bytes, -1, buffer)
-                            .sendToTarget();
-                } catch (IOException e) {
-                    break;
+                // Keep listening to the InputStream until an exception occurs
+                while (true) {
+                    try {
+                        // Read from the InputStream
+                        bytes = mmInStream.read(buffer);
+
+                        Bundle lBundle = new Bundle();
+                        lBundle.putString("Device Name", mmSocket.getRemoteDevice().getName());
+
+                        Message msg = mHandler.obtainMessage(1, bytes, -1, buffer);
+                        msg.setData(lBundle);
+                        msg.sendToTarget();
+                    } catch (IOException e) {
+                        break;
+                    }
                 }
+            } else {
+                String test = "dickbutt";
+                byte[] data = test.getBytes();
+                write(data);
             }
         }
 

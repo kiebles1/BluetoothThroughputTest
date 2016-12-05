@@ -3,6 +3,8 @@ package com.example.steven.bluetooththroughputtest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -40,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
             findViewById(R.id.pair_button).setEnabled(false);
         }
 
-        mBtManager = new BluetoothManager(lBluetoothAdapter);
+        mBtManager = new BluetoothManager(lBluetoothAdapter, mHandler);
 
     }
 
@@ -95,4 +97,19 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+    //PRIVATE:
+
+    private final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch(msg.what) {
+                case 1:
+                    ((TextView) findViewById(R.id.androidConsoleTV)).
+                            setText(msg.getData().getString("Device Name"));
+
+                    break;
+            }
+        }
+    };
 }

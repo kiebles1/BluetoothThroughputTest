@@ -28,8 +28,10 @@ class BluetoothManager {
     private BluetoothAdapter mBtAdapter;
     private Set<BluetoothDevice> mBtDevices;
     private boolean mIsServer;
+    private Handler mHandler;
 
-    BluetoothManager(BluetoothAdapter pBtAdapter) {
+    BluetoothManager(BluetoothAdapter pBtAdapter, Handler pHandler) {
+        mHandler = pHandler;
 
         //Save bluetooth adapter as class member
         mBtAdapter = pBtAdapter;
@@ -61,6 +63,16 @@ class BluetoothManager {
             }
 
         }
+
+    }
+
+    public void manageConnectedSocket(BluetoothSocket socket, BluetoothDevice
+            device) {
+
+        //ConnectedThread lConnectedThread = new ConnectedThread(socket);
+        //lConnectedThread.start();
+        //TODO: manage connection
+
 
     }
 
@@ -142,56 +154,49 @@ class BluetoothManager {
 
     private class ConnectThread extends Thread {
 
-        private final BluetoothSocket mmSocket;
-        private final BluetoothDevice mmDevice;
+        private final BluetoothSocket mSocket;
+        private final BluetoothDevice mDevice;
 
         ConnectThread(BluetoothDevice pServerDevice) {
 
             //Server device should come from list of paired devices. See https://developer.android.com/guide/topics/connectivity/bluetooth.html#ConnectingDevices for help
 
             BluetoothSocket tmp = null;
-            mmDevice = pServerDevice;
+            mDevice = pServerDevice;
 
             // Get a BluetoothSocket to connect with the given BluetoothDevice
             try {
                 // MY_UUID is the app's UUID string, also used by the server code
-                tmp = mmDevice.createRfcommSocketToServiceRecord(MY_UUID);
+                tmp = mDevice.createRfcommSocketToServiceRecord(MY_UUID);
             } catch (IOException e) { }
-            mmSocket = tmp;
+            mSocket = tmp;
         }
 
         public void run() {
-            // Cancel discovery because it will slow down the connection
-            mBtAdapter.cancelDiscovery();
 
             try {
                 // Connect the device through the socket. This will block
                 // until it succeeds or throws an exception
-                mmSocket.connect();
+                mSocket.connect();
             } catch (IOException connectException) {
                 // Unable to connect; close the socket and get out
                 try {
-                    mmSocket.close();
+                    mSocket.close();
                 } catch (IOException closeException) { }
                 return;
             }
 
+
             // Do work to manage the connection (in a separate thread)
             //TODO: Create process to manage the connection
-            manageConnectedSocket();
+            manageConnectedSocket(mSocket, mDevice);
         }
 
         /** Will cancel an in-progress connection, and close the socket */
         public void cancel() {
             try {
-                mmSocket.close();
+                mSocket.close();
             } catch (IOException e) { }
-        }
-
-        void manageConnectedSocket() {
-            ConnectedThread lConnectedThread = new ConnectedThread(mmSocket);
-            //TODO: manage connection
-
         }
     }
 
@@ -199,11 +204,9 @@ class BluetoothManager {
         private final BluetoothSocket mmSocket;
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
-        private Handler mHandler;
 
         public ConnectedThread(BluetoothSocket socket) {
             mmSocket = socket;
-            mHandler = new Handler();
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
 

@@ -64,27 +64,23 @@ class BluetoothManager {
             Log.d("BluetoothThroughputTest", "Client Mode");
 
             for (BluetoothDevice device : mBtDevices) {
-                ConnectThread lConnectThread = new ConnectThread(device);
-                lConnectThread.start();
+                String deviceName = device.getName();
+                if (deviceName == "Nexus 6P" || deviceName == "MotoG3" || deviceName == "Maud'Dib") {
+                    ConnectThread lConnectThread = new ConnectThread(device);
+                    lConnectThread.start();
+                }
             }
 
         }
 
     }
 
-//    public void manageConnectedWrite(BluetoothSocket socket) {
-//        ConnectedThread lConnectedThread = new ConnectedThread(socket, 1);
-//        lConnectedThread.start();
-//    }
-
     //PRIVATE:
     private void manageConnectedSocket(BluetoothSocket socket) {
-
         ConnectedThread lConnectedThread = new ConnectedThread(socket, 0);
         lConnectedThread.start();
         ConnectedThread lConnectedThreadWrite = new ConnectedThread(socket, 1);
         lConnectedThreadWrite.start();
-
     }
 
     private void QueryPairedDevices() {
@@ -262,6 +258,9 @@ class BluetoothManager {
                         break;
                     }
                 }
+
+                //if master and if read, we need to assemble data and retransmit
+                //Call function in main bluetooth manager class, and pass read data. 
             } else {
                 //String test = "Test String";
                 byte[] data = new byte[4];

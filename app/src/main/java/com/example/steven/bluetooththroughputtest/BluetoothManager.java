@@ -87,10 +87,19 @@ class BluetoothManager {
     }
 
     //PRIVATE:
-    private void manageConnectedSocket(BluetoothSocket socket) {
+    private void manageConnectedSockets(BluetoothSocket[] sockets) {
 
         Log.d("Thread ID", String.valueOf(android.os.Process.getThreadPriority(android.os.Process.myTid())));
 
+            for(BluetoothSocket socket : sockets) {
+                ConnectedThread lConnectedThread = new ConnectedThread(socket, 0);
+                lConnectedThread.start();
+                ConnectedThread lConnectedThreadWrite = new ConnectedThread(socket, 1);
+                lConnectedThreadWrite.start();
+            }
+    }
+
+    private void manageConnectedSockets(BluetoothSocket socket) {
         ConnectedThread lConnectedThread = new ConnectedThread(socket, 0);
         lConnectedThread.start();
         ConnectedThread lConnectedThreadWrite = new ConnectedThread(socket, 1);
@@ -130,13 +139,13 @@ class BluetoothManager {
 
         public void run() {
 
-            BluetoothSocket[] socket = new BluetoothSocket[2];
+            BluetoothSocket[] sockets = new BluetoothSocket[2];
             int socketIndex = 0;
 
             //Wait for incoming connection request
             while(true) {
                 try {
-                    socket[socketIndex] = mServerSocket.accept();
+                    sockets[socketIndex] = mServerSocket.accept();
                 }
                 catch (IOException e) {
                     e.printStackTrace();
@@ -144,15 +153,15 @@ class BluetoothManager {
                 }
 
                 //Check if connection has been established
-                if(socket[socketIndex] != null) {
+                if(sockets[socketIndex] != null) {
 
-                    Log.d("BluetoothThroughputTest", socket[socketIndex].getRemoteDevice().getName());
+                    Log.d("BluetoothThroughputTest", sockets[socketIndex].getRemoteDevice().getName());
 
-                    manageConnectedSocket(socket[socketIndex]);
+                    manageConnectedSockets(sockets);
 
                     socketIndex++;
 
-                    //if(socketIndex > 1) {
+                    if(socketIndex > 1) {
                         try {
                             mServerSocket.close();
                         } catch (IOException e) {
@@ -160,7 +169,7 @@ class BluetoothManager {
                         }
 
                         break;
-                    //}
+                    }
                 }
             }
         }
@@ -215,7 +224,7 @@ class BluetoothManager {
                 return;
             }
 
-            manageConnectedSocket(mSocket);
+            manageConnectedSockets(mSocket);
         }
 
         /** Will cancel an in-progress connection, and close the socket */

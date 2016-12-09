@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.util.TimingLogger;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,6 +36,7 @@ class BluetoothManager {
     private boolean mIsServer = true;
     private Handler mHandler;
     private List<byte[]> mMasterData = new ArrayList<byte[]>();
+    private TimingLogger mTimer;
 
     BluetoothManager(BluetoothAdapter pBtAdapter, Handler pHandler) {
         mHandler = pHandler;
@@ -60,10 +62,14 @@ class BluetoothManager {
         //put together data into a centralized structure, then retransmit
         mMasterData.add(data);
         Log.d("BluetoothThroughputTest", "Master received byte array");
+        if (mMasterData.size() == 3) {
+            mTimer.dumpToLog();
+        }
     }
 
     void EstablishConnection() {
 
+        mTimer = new TimingLogger("Blue Sun Timer", "Share Data Over Bluetooth");
         if(mIsServer) {
             AcceptThread lAcceptThread = new AcceptThread();
             lAcceptThread.start();

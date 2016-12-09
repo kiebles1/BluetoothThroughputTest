@@ -72,11 +72,6 @@ class BluetoothManager {
 
     }
 
-//    public void manageConnectedWrite(BluetoothSocket socket) {
-//        ConnectedThread lConnectedThread = new ConnectedThread(socket, 1);
-//        lConnectedThread.start();
-//    }
-
     //PRIVATE:
     private void manageConnectedSocket(BluetoothSocket socket) {
 
@@ -120,14 +115,13 @@ class BluetoothManager {
 
         public void run() {
 
-            BluetoothSocket socket;
-
-            Log.d("BluetoothThroughputTest", "Trying to establish connections.");
+            BluetoothSocket[] socket = new BluetoothSocket[2];
+            int socketIndex = 0;
 
             //Wait for incoming connection request
             while(true) {
                 try {
-                    socket = mServerSocket.accept();
+                    socket[socketIndex] = mServerSocket.accept();
                 }
                 catch (IOException e) {
                     e.printStackTrace();
@@ -135,20 +129,23 @@ class BluetoothManager {
                 }
 
                 //Check if connection has been established
-                if(socket != null) {
+                if(socket[socketIndex] != null) {
 
-                    Log.d("BluetoothThroughputTest", socket.getRemoteDevice().getName());
+                    Log.d("BluetoothThroughputTest", socket[socketIndex].getRemoteDevice().getName());
 
-                    manageConnectedSocket(socket);
-                    //Add in call to a function that creates a connectedthread
-                    //manageConnectedWrite(mSocket, mDevice);
+                    manageConnectedSocket(socket[socketIndex]);
+
                     try {
                         mServerSocket.close();
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
 
-                    break;
+                    socketIndex++;
+
+                    if(socketIndex > 1) {
+                        break;
+                    }
                 }
             }
         }

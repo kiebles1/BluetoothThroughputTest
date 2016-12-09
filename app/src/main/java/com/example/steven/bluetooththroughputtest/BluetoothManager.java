@@ -65,7 +65,8 @@ class BluetoothManager {
 
             for (BluetoothDevice device : mBtDevices) {
                 String deviceName = device.getName();
-                if (deviceName == "Nexus 6P" || deviceName == "MotoG3" || deviceName == "Maud'Dib") {
+                Log.d("BluetoothThroughputTest", deviceName);
+                if (deviceName.compareTo("Nexus 6P") == 1 || deviceName.compareTo("MotoG3") == 1 || deviceName.compareTo("Maud'Dib") == 1) {
                     ConnectThread lConnectThread = new ConnectThread(device);
                     lConnectThread.start();
                 }

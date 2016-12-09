@@ -253,7 +253,7 @@ class BluetoothManager {
                         bufferLength = mmInStream.read(buffer);
 
                         Bundle lBundle = new Bundle();
-                        lBundle.putString("Device Name", new String(Arrays.copyOfRange(buffer, 0, bufferLength-1)));
+                        lBundle.putByteArray("Device Name", (Arrays.copyOfRange(buffer, 0, bufferLength-1)));
 
                         Message msg = mHandler.obtainMessage(1);
                         msg.setData(lBundle);
@@ -263,8 +263,18 @@ class BluetoothManager {
                     }
                 }
             } else {
-                String test = "Test String";
-                byte[] data = test.getBytes();
+                //String test = "Test String";
+                byte[] data = new byte[4];
+                if(mIsServer) {
+                    for(int i = 0; i < 4; i++) {
+                        data[i] = ((byte)(i*2));
+                    }
+                }
+                else {
+                    for(int i = 0; i < 4; i++) {
+                        data[i] = ((byte)(i*2+1));
+                    }
+                }
                 write(data);
             }
         }

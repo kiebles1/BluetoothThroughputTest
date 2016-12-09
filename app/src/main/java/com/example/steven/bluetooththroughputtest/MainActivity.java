@@ -14,6 +14,9 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
+import java.util.ArrayList;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
@@ -100,14 +103,25 @@ public class MainActivity extends AppCompatActivity {
 
     //PRIVATE:
 
+    private ArrayList<Integer> ByteArrayToIntList(byte[] bytes) {
+
+        ArrayList<Integer> intList = new ArrayList<Integer>();
+
+        for(byte b : bytes) {
+            intList.add((int)(b));
+        }
+
+        return intList;
+    }
+
     private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             switch(msg.what) {
                 case 1:
-                    ((TextView) findViewById(R.id.androidConsoleTV)).
-                            setText(msg.getData().getString("Device Name"));
-
+                    byte[] integerBytes = msg.getData().getByteArray("Device Name");
+                    ArrayList<Integer> integerList = ByteArrayToIntList(integerBytes);
+                    ((TextView) findViewById(R.id.androidConsoleTV)).setText(integerList.toString());
                     break;
             }
         }

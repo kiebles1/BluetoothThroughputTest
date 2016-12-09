@@ -157,11 +157,12 @@ class BluetoothManager {
 
                     Log.d("BluetoothThroughputTest", sockets[socketIndex].getRemoteDevice().getName());
 
-                    manageConnectedSockets(sockets);
-
                     socketIndex++;
 
                     if(socketIndex > 1) {
+
+                        manageConnectedSockets(sockets);
+
                         try {
                             mServerSocket.close();
                         } catch (IOException e) {

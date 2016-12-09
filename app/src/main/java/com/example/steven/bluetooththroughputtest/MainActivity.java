@@ -117,11 +117,22 @@ public class MainActivity extends AppCompatActivity {
     private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
+            byte[] integerBytes;
+            ArrayList<Integer> integerList;
             switch(msg.what) {
                 case 1:
-                    byte[] integerBytes = msg.getData().getByteArray("Device Name");
-                    ArrayList<Integer> integerList = ByteArrayToIntList(integerBytes);
-                    ((TextView) findViewById(R.id.androidConsoleTV)).setText(integerList.toString());
+                    integerBytes = msg.getData().getByteArray("Device Name");
+                    integerList = ByteArrayToIntList(integerBytes);
+                    ((TextView) findViewById(R.id.androidConsoleTV)).append(integerList.toString());
+                    break;
+                case 2:
+                    integerBytes = msg.getData().getByteArray("Device Name");
+                    mBtManager.AssembleData(integerBytes);
+                    integerList = ByteArrayToIntList(integerBytes);
+                    if (((TextView) findViewById(R.id.androidConsoleTV)).getText().toString().compareTo("Console") == 1) {
+                        ((TextView) findViewById(R.id.androidConsoleTV)).setText("");
+                    }
+                    ((TextView) findViewById(R.id.androidConsoleTV)).append(integerList.toString());
                     break;
             }
         }

@@ -12,7 +12,9 @@ import android.os.Message;
 import android.util.Log;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -32,6 +34,7 @@ class BluetoothManager {
     private Set<BluetoothDevice> mBtDevices;
     private boolean mIsServer = true;
     private Handler mHandler;
+    private List<byte[]> mMasterData = new ArrayList<byte[]>();
 
     BluetoothManager(BluetoothAdapter pBtAdapter, Handler pHandler) {
         mHandler = pHandler;
@@ -51,6 +54,12 @@ class BluetoothManager {
             QueryPairedDevices();
         }
         return mBtDevices;
+    }
+
+    void AssembleData(byte[] data) {
+        //put together data into a centralized structure, then retransmit
+        mMasterData.add(data);
+        Log.d("BluetoothThroughputTest", "Master received byte array");
     }
 
     void EstablishConnection() {
@@ -254,7 +263,13 @@ class BluetoothManager {
                         Bundle lBundle = new Bundle();
                         lBundle.putByteArray("Device Name", (Arrays.copyOfRange(buffer, 0, bufferLength-1)));
 
-                        Message msg = mHandler.obtainMessage(1);
+                        int messageType = 1;
+                        if (mIsServer) {
+                            messageType = 2;
+                        }
+                        //if master and if read, we need to assemble all the data and retransmit from the server
+                        //Passing a 2 tells the main thread to send the data back to master.
+                        Message msg = mHandler.obtainMessage(messageType);
                         msg.setData(lBundle);
                         msg.sendToTarget();
                     } catch (IOException e) {
@@ -262,8 +277,7 @@ class BluetoothManager {
                     }
                 }
 
-                //if master and if read, we need to assemble data and retransmit
-                //Call function in main bluetooth manager class, and pass read data. 
+
             } else {
                 //String test = "Test String";
                 byte[] data = new byte[4];
@@ -271,6 +285,14 @@ class BluetoothManager {
                     for(int i = 0; i < 4; i++) {
                         data[i] = ((byte)(i*2));
                     }
+                    //If it's the server, send this to it's own internal copy of data.
+                    Bundle lBundle = new Bundle();
+                    lBundle.putByteArray("Device Name", (Arrays.copyOfRange(data, 0, data.length - 1)));
+
+                    int messageType = 2;
+                    Message msg = mHandler.obtainMessage(messageType);
+                    msg.setData(lBundle);
+                    msg.sendToTarget();
                 }
                 else {
                     for(int i = 0; i < 4; i++) {

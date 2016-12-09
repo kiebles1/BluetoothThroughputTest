@@ -12,6 +12,7 @@ import android.os.Message;
 import android.util.Log;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Set;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -71,26 +72,21 @@ class BluetoothManager {
 
     }
 
-    public void manageConnectedSocket(BluetoothSocket socket, BluetoothDevice
-            device) {
+//    public void manageConnectedWrite(BluetoothSocket socket) {
+//        ConnectedThread lConnectedThread = new ConnectedThread(socket, 1);
+//        lConnectedThread.start();
+//    }
+
+    //PRIVATE:
+    private void manageConnectedSocket(BluetoothSocket socket) {
 
         ConnectedThread lConnectedThread = new ConnectedThread(socket, 0);
         lConnectedThread.start();
-        //ConnectedThread lConnectedThread = new ConnectedThread(socket);
-        //lConnectedThread.write();
-        //lConnectedThread.start();
-        //TODO: manage connection
-
+        ConnectedThread lConnectedThreadWrite = new ConnectedThread(socket, 1);
+        lConnectedThreadWrite.start();
 
     }
 
-    //TODO: finish this function too
-    public void manageConnectedWrite(BluetoothSocket socket) {
-        ConnectedThread lConnectedThread = new ConnectedThread(socket, 1);
-        lConnectedThread.start();
-    }
-
-    //PRIVATE:
     private void QueryPairedDevices() {
 
         //Get set (no repeats, max 1 null value) of paired devices
@@ -143,7 +139,7 @@ class BluetoothManager {
 
                     Log.d("BluetoothThroughputTest", socket.getRemoteDevice().getName());
 
-                    manageConnectedWrite(socket);
+                    manageConnectedSocket(socket);
                     //Add in call to a function that creates a connectedthread
                     //manageConnectedWrite(mSocket, mDevice);
                     try {
@@ -185,7 +181,9 @@ class BluetoothManager {
             try {
                 // MY_UUID is the app's UUID string, also used by the server code
                 tmp = mDevice.createRfcommSocketToServiceRecord(MY_UUID);
-            } catch (IOException e) { }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             mSocket = tmp;
         }
 
@@ -199,18 +197,22 @@ class BluetoothManager {
                 // Unable to connect; close the socket and get out
                 try {
                     mSocket.close();
-                } catch (IOException closeException) { }
+                } catch (IOException closeException) {
+                    closeException.printStackTrace();
+                }
                 return;
             }
 
-            manageConnectedSocket(mSocket, mDevice);
+            manageConnectedSocket(mSocket);
         }
 
         /** Will cancel an in-progress connection, and close the socket */
         public void cancel() {
             try {
                 mSocket.close();
-            } catch (IOException e) { }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -220,7 +222,7 @@ class BluetoothManager {
         private final OutputStream mmOutStream;
         private final int mType; //0 means read, 1 means write
 
-        public ConnectedThread(BluetoothSocket socket, int type) {
+         ConnectedThread(BluetoothSocket socket, int type) {
             mmSocket = socket;
             mType = type;
             InputStream tmpIn = null;
@@ -231,7 +233,9 @@ class BluetoothManager {
             try {
                 tmpIn = socket.getInputStream();
                 tmpOut = socket.getOutputStream();
-            } catch (IOException e) { }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
             mmInStream = tmpIn;
             mmOutStream = tmpOut;
@@ -240,16 +244,16 @@ class BluetoothManager {
         public void run() {
             if (mType == 0) {
                 byte[] buffer = new byte[1024];  // buffer store for the stream
-                int bytes; // bytes returned from read()
+                int bufferLength;
 
                 // Keep listening to the InputStream until an exception occurs
                 while (true) {
                     try {
                         // Read from the InputStream
-                        bytes = mmInStream.read(buffer);
+                        bufferLength = mmInStream.read(buffer);
 
                         Bundle lBundle = new Bundle();
-                        lBundle.putString("Device Name", new String(buffer));
+                        lBundle.putString("Device Name", new String(Arrays.copyOfRange(buffer, 0, bufferLength-1)));
 
                         Message msg = mHandler.obtainMessage(1);
                         msg.setData(lBundle);
@@ -259,24 +263,28 @@ class BluetoothManager {
                     }
                 }
             } else {
-                String test = "dickbutt";
+                String test = "Test String";
                 byte[] data = test.getBytes();
                 write(data);
             }
         }
 
         /* Call this from the main activity to send data to the remote device */
-        public void write(byte[] bytes) {
+        void write(byte[] bytes) {
             try {
                 mmOutStream.write(bytes);
-            } catch (IOException e) { }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         /* Call this from the main activity to shutdown the connection */
         public void cancel() {
             try {
                 mmSocket.close();
-            } catch (IOException e) { }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

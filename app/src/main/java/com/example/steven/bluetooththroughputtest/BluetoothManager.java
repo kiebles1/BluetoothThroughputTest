@@ -87,6 +87,9 @@ class BluetoothManager {
 
     //PRIVATE:
     private void manageConnectedSocket(BluetoothSocket socket) {
+
+        Log.d("Thread ID", String.valueOf(android.os.Process.getThreadPriority(android.os.Process.myTid())));
+
         ConnectedThread lConnectedThread = new ConnectedThread(socket, 0);
         lConnectedThread.start();
         ConnectedThread lConnectedThreadWrite = new ConnectedThread(socket, 1);
@@ -146,17 +149,17 @@ class BluetoothManager {
 
                     manageConnectedSocket(socket[socketIndex]);
 
-                    try {
-                        mServerSocket.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-
                     socketIndex++;
 
-                    if(socketIndex > 1) {
+                    //if(socketIndex > 1) {
+                        try {
+                            mServerSocket.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
                         break;
-                    }
+                    //}
                 }
             }
         }

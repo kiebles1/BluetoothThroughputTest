@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
                     integerBytes = msg.getData().getByteArray("Device Name");
                     mBtManager.AssembleData(integerBytes);
                     integerList = ByteArrayToIntList(integerBytes);
-                    if (((TextView) findViewById(R.id.androidConsoleTV)).getText().toString().compareTo("Console") == 1) {
+                    if (((TextView) findViewById(R.id.androidConsoleTV)).getText().toString().compareTo("Console") == 0) {
                         ((TextView) findViewById(R.id.androidConsoleTV)).setText("");
                     }
                     ((TextView) findViewById(R.id.androidConsoleTV)).append(integerList.toString());

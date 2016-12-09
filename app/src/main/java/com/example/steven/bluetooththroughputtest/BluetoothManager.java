@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.SystemClock;
 import android.util.Log;
 import android.util.TimingLogger;
 
@@ -35,6 +36,8 @@ class BluetoothManager {
     private Set<BluetoothDevice> mBtDevices;
     private boolean mIsServer = true;
     private Handler mHandler;
+    private long mDataGatherStartTime;
+    private long mDataGatherEndTime;
     private List<byte[]> mMasterData = new ArrayList<byte[]>();
     private TimingLogger mTimer;
 
@@ -60,17 +63,29 @@ class BluetoothManager {
 
     void AssembleData(byte[] data) {
         //put together data into a centralized structure, then retransmit
+
+        mDataGatherEndTime = SystemClock.elapsedRealtime();
+
+        Bundle lBundle = new Bundle();
+        lBundle.putLong("Start Time", mDataGatherStartTime);
+        lBundle.putLong("End Time", mDataGatherEndTime);
+
+        int messageType = 3;
+
+        Message msg = mHandler.obtainMessage(messageType);
+        msg.setData(lBundle);
+        msg.sendToTarget();
+
         mMasterData.add(data);
-        Log.d("BluetoothThroughputTest", "Master received byte array");
-        if (mMasterData.size() == 3) {
-            mTimer.dumpToLog();
-        }
+
     }
 
     void EstablishConnection() {
 
-        mTimer = new TimingLogger("Blue Sun Timer", "Share Data Over Bluetooth");
         if(mIsServer) {
+
+            mDataGatherStartTime = SystemClock.elapsedRealtime();
+
             AcceptThread lAcceptThread = new AcceptThread();
             lAcceptThread.start();
         }
@@ -81,7 +96,7 @@ class BluetoothManager {
             for (BluetoothDevice device : mBtDevices) {
                 String deviceName = device.getName();
                 Log.d("BluetoothThroughputTest", "Attempting to connect with paired devices");
-                if (deviceName.compareTo("Nexus 6P") == 0 || deviceName.compareTo("MotoG3") == 0 || deviceName.compareTo("Maud'Dib") == 0) {
+                if (deviceName.compareTo("Nexus 6P") == 0 || deviceName.compareTo("MotoG3") == 0 || deviceName.compareTo("Muad'Dib") == 0) {
                     Log.d("BluetoothThroughputTest", "Connected to " + deviceName);
                     ConnectThread lConnectThread = new ConnectThread(device);
                     lConnectThread.start();

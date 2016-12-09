@@ -119,21 +119,27 @@ public class MainActivity extends AppCompatActivity {
         public void handleMessage(Message msg) {
             byte[] integerBytes;
             ArrayList<Integer> integerList;
+            TextView androidConsoleTextView = ((TextView) findViewById(R.id.androidConsoleTV));
             switch(msg.what) {
                 case 1:
                     integerBytes = msg.getData().getByteArray("Device Name");
                     integerList = ByteArrayToIntList(integerBytes);
-                    ((TextView) findViewById(R.id.androidConsoleTV)).append(integerList.toString());
+                    androidConsoleTextView.append(integerList.toString());
                     break;
                 case 2:
                     integerBytes = msg.getData().getByteArray("Device Name");
                     mBtManager.AssembleData(integerBytes);
                     integerList = ByteArrayToIntList(integerBytes);
-                    if (((TextView) findViewById(R.id.androidConsoleTV)).getText().toString().compareTo("Console") == 0) {
-                        ((TextView) findViewById(R.id.androidConsoleTV)).setText("");
+                    if (androidConsoleTextView.getText().toString().compareTo("Console") == 0) {
+                        androidConsoleTextView.setText("");
                     }
-                    ((TextView) findViewById(R.id.androidConsoleTV)).append(integerList.toString());
+                    androidConsoleTextView.append(integerList.toString());
                     break;
+                case 3:
+                    long startTime = msg.getData().getLong("Start Time");
+                    long endTime = msg.getData().getLong("End Time");
+
+                    androidConsoleTextView.append(String.valueOf(endTime - startTime));
             }
         }
     };

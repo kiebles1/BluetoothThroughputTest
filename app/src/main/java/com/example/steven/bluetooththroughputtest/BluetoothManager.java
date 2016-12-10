@@ -333,15 +333,16 @@ class BluetoothManager {
                         // Read from the InputStream
                         bufferLength = mmInStream.read(buffer);
 
-                        Bundle lBundle = new Bundle();
-                        lBundle.putInt("Device Name", bufferLength);
-                        //lBundle.putByteArray("Device Name", (Arrays.copyOfRange(buffer, 0, bufferLength)));
-
                         int messageType = 1;
+                        Bundle lBundle = new Bundle();
                         if (mIsServer) {
                             messageType = 2;
+
+                            lBundle.putInt("Device Name", bufferLength);
+                            lBundle.putByteArray("Device Name", (Arrays.copyOfRange(buffer, 0, bufferLength)));
+                        } else {
+                            lBundle.putInt("Device Name", bufferLength);
                         }
-                        //if master and if read, we need to assemble all the data and retransmit from the server
                         //Passing a 2 tells the main thread to send the data back to master.
                         Message msg = mHandler.obtainMessage(messageType);
                         msg.setData(lBundle);

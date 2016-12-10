@@ -40,9 +40,7 @@ class BluetoothManager {
     private int mClientNumber = 1;
     private Handler mHandler;
     private long mDataGatherStartTime;
-    private long mDataGatherEndTime;
     private List<byte[]> mMasterData = new ArrayList<byte[]>();
-    private TimingLogger mTimer;
     private int dataIndex = 0;
     private List<ConnectedThread> mServerThreads = new ArrayList<ConnectedThread>();
 
@@ -100,21 +98,22 @@ class BluetoothManager {
             }
             Collections.sort(SortedData);
 
-            mDataGatherEndTime = SystemClock.elapsedRealtime();
-
-            Bundle lBundle = new Bundle();
-            lBundle.putLong("Start Time", mDataGatherStartTime);
-            lBundle.putLong("End Time", mDataGatherEndTime);
-
-            int messageType = 3;
-
-            Message msg = mHandler.obtainMessage(messageType);
-            msg.setData(lBundle);
-            msg.sendToTarget();
+//            mDataGatherEndTime = SystemClock.elapsedRealtime();
+//
+//            Bundle lBundle = new Bundle();
+//            lBundle.putLong("Start Time", mDataGatherStartTime);
+//            lBundle.putLong("End Time", mDataGatherEndTime);
+//
+//            int messageType = 3;
+//
+//            Message msg = mHandler.obtainMessage(messageType);
+//            msg.setData(lBundle);
+//            msg.sendToTarget();
             dataIndex = 0;
 
             for (ConnectedThread lThread : mServerThreads) {
                 lThread.write(masterbeta);
+                lThread.write(("End").getBytes());
             }
         }
     }
@@ -188,6 +187,9 @@ class BluetoothManager {
     }
 
     private void manageConnectedSockets(BluetoothSocket socket) {
+
+        mDataGatherStartTime = SystemClock.elapsedRealtime();
+
         byte[] writeData = createData();
         byte[] blankData = new byte[4];
 
@@ -368,20 +370,35 @@ class BluetoothManager {
                         // Read from the InputStream
                         bufferLength = mmInStream.read(buffer);
 
-                        int messageType = 1;
-                        Bundle lBundle = new Bundle();
-                        if (mIsServer) {
-                            messageType = 4;
+                        if(buffer.toString().compareTo("End") == 0) {
 
-                            lBundle.putInt("Device Name", bufferLength);
-                            lBundle.putByteArray("Device Name", (Arrays.copyOfRange(buffer, 0, bufferLength)));
-                        } else {
-                            lBundle.putInt("Device Name", bufferLength);
+                            Bundle lBundle = new Bundle();
+                            lBundle.putLong("Start Time", mDataGatherStartTime);
+                            lBundle.putLong("End Time", SystemClock.elapsedRealtime());
+
+                            int messageType = 3;
+
+                            Message msg = mHandler.obtainMessage(messageType);
+                            msg.setData(lBundle);
+                            msg.sendToTarget();
+
                         }
-                        //Passing a 2 tells the main thread to send the data back to master.
-                        Message msg = mHandler.obtainMessage(messageType);
-                        msg.setData(lBundle);
-                        msg.sendToTarget();
+                        else {
+                            int messageType = 1;
+                            Bundle lBundle = new Bundle();
+                            if (mIsServer) {
+                                messageType = 4;
+
+                                lBundle.putInt("Device Name", bufferLength);
+                                lBundle.putByteArray("Device Name", (Arrays.copyOfRange(buffer, 0, bufferLength)));
+                            } else {
+                                lBundle.putInt("Device Name", bufferLength);
+                            }
+                            //Passing a 2 tells the main thread to send the data back to master.
+                            Message msg = mHandler.obtainMessage(messageType);
+                            msg.setData(lBundle);
+                            msg.sendToTarget();
+                        }
                     } catch (IOException e) {
                         break;
                     }

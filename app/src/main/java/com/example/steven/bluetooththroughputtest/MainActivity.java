@@ -127,22 +127,21 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void handleMessage(Message msg) {
             byte[] integerBytes;
-            ArrayList<Integer> integerList;
+            int lengthRead = 0;
             TextView androidConsoleTextView = ((TextView) findViewById(R.id.androidConsoleTV));
             switch(msg.what) {
                 case 1:
-                    integerBytes = msg.getData().getByteArray("Device Name");
-                    integerList = ByteArrayToIntList(integerBytes);
-                    androidConsoleTextView.append(integerList.toString());
+                    lengthRead = msg.getData().getInt("Device Name");
+                    androidConsoleTextView.append(Integer.toString(lengthRead));
                     break;
                 case 2:
                     integerBytes = msg.getData().getByteArray("Device Name");
                     mBtManager.AssembleData(integerBytes);
-                    integerList = ByteArrayToIntList(integerBytes);
+                    lengthRead = integerBytes.length;
                     if (androidConsoleTextView.getText().toString().compareTo("Console") == 0) {
                         androidConsoleTextView.setText("");
                     }
-                    androidConsoleTextView.append(integerList.toString());
+                    androidConsoleTextView.append(Integer.toString(lengthRead));
                     break;
                 case 3:
                     long startTime = msg.getData().getLong("Start Time");

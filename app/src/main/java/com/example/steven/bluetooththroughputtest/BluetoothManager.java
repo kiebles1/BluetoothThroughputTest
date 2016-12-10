@@ -370,7 +370,9 @@ class BluetoothManager {
                         // Read from the InputStream
                         bufferLength = mmInStream.read(buffer);
 
-                        if(buffer.toString().compareTo("End") == 0) {
+                        String bufferString = new String(buffer);
+
+                        if(bufferString.compareTo("End") == 0) {
 
                             Bundle lBundle = new Bundle();
                             lBundle.putLong("Start Time", mDataGatherStartTime);

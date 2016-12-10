@@ -10,12 +10,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
+import android.support.v4.content.res.TypedArrayUtils;
 import android.util.Log;
 import android.util.TimingLogger;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.io.InputStream;
@@ -66,11 +68,30 @@ class BluetoothManager {
         return mBtDevices;
     }
 
+    private byte[] AddArrays(byte[] a, byte[] b) {
+        int aLen = a.length;
+        int bLen = b.length;
+        byte[] c= new byte[aLen+bLen];
+        System.arraycopy(a, 0, c, 0, aLen);
+        System.arraycopy(b, 0, c, aLen, bLen);
+        return c;
+    }
+
     void AssembleData(byte[] data) {
         //put together data into a centralized structure, then retransmit
         mMasterData.add(data);
+        List<Byte> SortedData = new ArrayList<Byte>();
+        if (mMasterData.size() > 6) {
+            byte[] masterbeta = new byte[12000];
+            for (int i =0; i < mMasterData.size()-1; i++) {
+                byte[] temp = AddArrays(mMasterData.get(i), mMasterData.get(i+1));
+                masterbeta = temp;
+            }
+            for (int i = 0; i < masterbeta.length; i++) {
+                SortedData.add(masterbeta[i]);
+            }
+            Collections.sort(SortedData);
 
-        if (mMasterData.size() == 3) {
             mDataGatherEndTime = SystemClock.elapsedRealtime();
 
             Bundle lBundle = new Bundle();

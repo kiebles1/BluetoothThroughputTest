@@ -63,28 +63,26 @@ class BluetoothManager {
 
     void AssembleData(byte[] data) {
         //put together data into a centralized structure, then retransmit
-
-        mDataGatherEndTime = SystemClock.elapsedRealtime();
-
-        Bundle lBundle = new Bundle();
-        lBundle.putLong("Start Time", mDataGatherStartTime);
-        lBundle.putLong("End Time", mDataGatherEndTime);
-
-        int messageType = 3;
-
-        Message msg = mHandler.obtainMessage(messageType);
-        msg.setData(lBundle);
-        msg.sendToTarget();
-
         mMasterData.add(data);
 
+        if (mMasterData.size() == 3) {
+            mDataGatherEndTime = SystemClock.elapsedRealtime();
+
+            Bundle lBundle = new Bundle();
+            lBundle.putLong("Start Time", mDataGatherStartTime);
+            lBundle.putLong("End Time", mDataGatherEndTime);
+
+            int messageType = 3;
+
+            Message msg = mHandler.obtainMessage(messageType);
+            msg.setData(lBundle);
+            msg.sendToTarget();
+        }
     }
 
     void EstablishConnection() {
 
         if(mIsServer) {
-
-            mDataGatherStartTime = SystemClock.elapsedRealtime();
 
             AcceptThread lAcceptThread = new AcceptThread();
             lAcceptThread.start();
@@ -107,23 +105,56 @@ class BluetoothManager {
 
     }
 
+    private byte[] createData() {
+        byte[] data = new byte[4];
+        if(mIsServer) {
+            for(int i = 0; i < 4; i++) {
+                data[i] = ((byte)(i*2));
+            }
+            //If it's the server, send this to it's own internal copy of data.
+            Bundle lBundle = new Bundle();
+            lBundle.putByteArray("Device Name", (Arrays.copyOfRange(data, 0, data.length)));
+
+            int messageType = 2;
+            Message msg = mHandler.obtainMessage(messageType);
+            msg.setData(lBundle);
+            msg.sendToTarget();
+        }
+        else {
+            for(int i = 0; i < 4; i++) {
+                data[i] = ((byte)(i*2+1));
+            }
+        }
+        return data;
+    }
+
     //PRIVATE:
     private void manageConnectedSockets(BluetoothSocket[] sockets) {
 
         Log.d("Thread ID", String.valueOf(android.os.Process.getThreadPriority(android.os.Process.myTid())));
 
+        mDataGatherStartTime = SystemClock.elapsedRealtime();
+
+        byte[] writeData = createData();
+        byte[] blankData = new byte[4];
+
+            // 0 is read, 1 is write
             for(BluetoothSocket socket : sockets) {
-                ConnectedThread lConnectedThread = new ConnectedThread(socket, 0);
+                ConnectedThread lConnectedThread = new ConnectedThread(socket, 0, blankData);
                 lConnectedThread.start();
-                ConnectedThread lConnectedThreadWrite = new ConnectedThread(socket, 1);
+                ConnectedThread lConnectedThreadWrite = new ConnectedThread(socket, 1, writeData);
                 lConnectedThreadWrite.start();
             }
     }
 
     private void manageConnectedSockets(BluetoothSocket socket) {
-        ConnectedThread lConnectedThread = new ConnectedThread(socket, 0);
+        byte[] writeData = createData();
+        byte[] blankData = new byte[4];
+
+        // 0 is read, 1 is write
+        ConnectedThread lConnectedThread = new ConnectedThread(socket, 0, blankData);
         lConnectedThread.start();
-        ConnectedThread lConnectedThreadWrite = new ConnectedThread(socket, 1);
+        ConnectedThread lConnectedThreadWrite = new ConnectedThread(socket, 1, writeData);
         lConnectedThreadWrite.start();
     }
 
@@ -264,12 +295,14 @@ class BluetoothManager {
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
         private final int mType; //0 means read, 1 means write
+        private byte[] mData;
 
-         ConnectedThread(BluetoothSocket socket, int type) {
+         ConnectedThread(BluetoothSocket socket, int type, byte[] pData) {
             mmSocket = socket;
             mType = type;
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
+             mData = pData;
 
             // Get the input and output streams, using temp objects because
             // member streams are final
@@ -314,27 +347,7 @@ class BluetoothManager {
 
 
             } else {
-                //String test = "Test String";
-                byte[] data = new byte[4];
-                if(mIsServer) {
-                    for(int i = 0; i < 4; i++) {
-                        data[i] = ((byte)(i*2));
-                    }
-                    //If it's the server, send this to it's own internal copy of data.
-                    Bundle lBundle = new Bundle();
-                    lBundle.putByteArray("Device Name", (Arrays.copyOfRange(data, 0, data.length - 1)));
-
-                    int messageType = 2;
-                    Message msg = mHandler.obtainMessage(messageType);
-                    msg.setData(lBundle);
-                    msg.sendToTarget();
-                }
-                else {
-                    for(int i = 0; i < 4; i++) {
-                        data[i] = ((byte)(i*2+1));
-                    }
-                }
-                write(data);
+                write(mData);
             }
         }
 

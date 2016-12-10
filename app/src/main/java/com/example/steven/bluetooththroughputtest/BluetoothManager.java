@@ -334,7 +334,7 @@ class BluetoothManager {
                         bufferLength = mmInStream.read(buffer);
 
                         Bundle lBundle = new Bundle();
-                        lBundle.putByteArray("Device Name", (Arrays.copyOfRange(buffer, 0, bufferLength-1)));
+                        lBundle.putByteArray("Device Name", (Arrays.copyOfRange(buffer, 0, bufferLength)));
 
                         int messageType = 1;
                         if (mIsServer) {

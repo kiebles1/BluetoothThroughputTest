@@ -85,11 +85,13 @@ public class MainActivity extends AppCompatActivity {
             case R.id.radioButton2:
 
                 mBtManager.SetMasterOrSlave(false);
+                mBtManager.SetClientNumber(1);
                 break;
 
             case R.id.radioButton3:
 
                 mBtManager.SetMasterOrSlave(false);
+                mBtManager.SetClientNumber(2);
                 break;
 
         }

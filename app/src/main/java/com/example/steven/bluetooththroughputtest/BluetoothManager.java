@@ -43,6 +43,8 @@ class BluetoothManager {
     private long mDataGatherEndTime;
     private List<byte[]> mMasterData = new ArrayList<byte[]>();
     private TimingLogger mTimer;
+    private int dataIndex = 0;
+    private List<ConnectedThread> mServerThreads = new ArrayList<ConnectedThread>();
 
     BluetoothManager(BluetoothAdapter pBtAdapter, Handler pHandler) {
         mHandler = pHandler;
@@ -80,11 +82,17 @@ class BluetoothManager {
     void AssembleData(byte[] data) {
         //put together data into a centralized structure, then retransmit
         mMasterData.add(data);
+        dataIndex += data.length;
         List<Byte> SortedData = new ArrayList<Byte>();
-        if (mMasterData.size() > 6) {
+        if (dataIndex == 12000) {
             byte[] masterbeta = new byte[12000];
-            for (int i =0; i < mMasterData.size()-1; i++) {
-                byte[] temp = AddArrays(mMasterData.get(i), mMasterData.get(i+1));
+            for (int i =0; i < mMasterData.size(); i++) {
+                byte[] temp = new byte[12000];
+                if (i == 0) {
+                    temp = AddArrays(mMasterData.get(i), mMasterData.get(i + 1));
+                    i++;
+                } else
+                    temp = AddArrays(temp, mMasterData.get(i));
                 masterbeta = temp;
             }
             for (int i = 0; i < masterbeta.length; i++) {
@@ -103,6 +111,11 @@ class BluetoothManager {
             Message msg = mHandler.obtainMessage(messageType);
             msg.setData(lBundle);
             msg.sendToTarget();
+            dataIndex = 0;
+
+            for (ConnectedThread lThread : mServerThreads) {
+                lThread.write(masterbeta);
+            }
         }
     }
 
@@ -170,6 +183,7 @@ class BluetoothManager {
                 lConnectedThread.start();
                 ConnectedThread lConnectedThreadWrite = new ConnectedThread(socket, 1, writeData);
                 lConnectedThreadWrite.start();
+                mServerThreads.add(lConnectedThreadWrite);
             }
     }
 

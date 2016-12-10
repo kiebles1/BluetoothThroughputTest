@@ -35,10 +35,18 @@
                     android:onClick="onRadioButton"/>
 
                 <RadioButton
-                    android:text="@string/client_radio"
+                    android:text="@string/client_radio_1"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:id="@+id/radioButton2"
+                    android:layout_weight="1"
+                    android:onClick="onRadioButton"/>
+
+                <RadioButton
+                    android:text="@string/client_radio_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/radioButton3"
                     android:layout_weight="1"
                     android:onClick="onRadioButton"/>
             </RadioGroup>

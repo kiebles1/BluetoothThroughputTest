@@ -86,6 +86,12 @@ public class MainActivity extends AppCompatActivity {
 
                 mBtManager.SetMasterOrSlave(false);
                 break;
+
+            case R.id.radioButton3:
+
+                mBtManager.SetMasterOrSlave(false);
+                break;
+
         }
 
     }
@@ -96,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
             if(resultCode == RESULT_OK) {
                 findViewById(R.id.radioButton1).setEnabled(true);
                 findViewById(R.id.radioButton2).setEnabled(true);
+                findViewById(R.id.radioButton3).setEnabled(true);
                 findViewById(R.id.pair_button).setEnabled(true);
             }
         }

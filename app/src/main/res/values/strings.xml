@@ -2,7 +2,8 @@
     <string name="app_name">BluetoothThroughputTest</string>
     <string name="paired_devices_button">Update Paired Devices</string>
     <string name="server_radio">I am the server</string>
-    <string name="client_radio">I am a client</string>
+    <string name="client_radio_1">I am client 1</string>
+    <string name="client_radio_2">I am client 2</string>
     <string name="connection_button">Establish Bluetooth channel</string>
     <string name="console_string">Console</string>
 </resources>

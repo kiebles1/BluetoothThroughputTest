@@ -35,6 +35,7 @@ class BluetoothManager {
     private BluetoothAdapter mBtAdapter;
     private Set<BluetoothDevice> mBtDevices;
     private boolean mIsServer = true;
+    private int mClientNumber = 1;
     private Handler mHandler;
     private long mDataGatherStartTime;
     private long mDataGatherEndTime;
@@ -52,6 +53,10 @@ class BluetoothManager {
 
     void SetMasterOrSlave(boolean pIsMaster) {
         mIsServer = pIsMaster;
+    }
+
+    void SetClientNumber(int pClientNumber) {
+        mClientNumber = pClientNumber;
     }
 
     Set<BluetoothDevice> GetPairedDevices() {
@@ -109,7 +114,7 @@ class BluetoothManager {
         byte[] data = new byte[4];
         if(mIsServer) {
             for(int i = 0; i < 4; i++) {
-                data[i] = ((byte)(i*2));
+                data[i] = ((byte)(i*3));
             }
             //If it's the server, send this to it's own internal copy of data.
             Bundle lBundle = new Bundle();
@@ -122,7 +127,7 @@ class BluetoothManager {
         }
         else {
             for(int i = 0; i < 4; i++) {
-                data[i] = ((byte)(i*2+1));
+                data[i] = ((byte)(i*3+mClientNumber));
             }
         }
         return data;

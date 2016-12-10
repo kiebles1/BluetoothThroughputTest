@@ -111,9 +111,9 @@ class BluetoothManager {
     }
 
     private byte[] createData() {
-        byte[] data = new byte[2000];
+        byte[] data = new byte[4000];
         if(mIsServer) {
-            for(int i = 0; i < 2000; i++) {
+            for(int i = 0; i < 4000; i++) {
                 data[i] = ((byte)(i*3));
             }
             //If it's the server, send this to it's own internal copy of data.
@@ -126,7 +126,7 @@ class BluetoothManager {
             msg.sendToTarget();
         }
         else {
-            for(int i = 0; i < 2000; i++) {
+            for(int i = 0; i < 4000; i++) {
                 data[i] = ((byte)(i*3+mClientNumber));
             }
         }
@@ -324,7 +324,7 @@ class BluetoothManager {
 
         public void run() {
             if (mType == 0) {
-                byte[] buffer = new byte[2000];  // buffer store for the stream
+                byte[] buffer = new byte[4000];  // buffer store for the stream
                 int bufferLength;
 
                 // Keep listening to the InputStream until an exception occurs

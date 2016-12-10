@@ -372,7 +372,7 @@ class BluetoothManager {
 
                         String bufferString = new String(buffer);
 
-                        if(bufferString.compareTo("End") == 0) {
+                        if(bufferString.substring(bufferLength - 3, bufferLength).compareTo("End") == 0) {
 
                             Bundle lBundle = new Bundle();
                             lBundle.putLong("Start Time", mDataGatherStartTime);

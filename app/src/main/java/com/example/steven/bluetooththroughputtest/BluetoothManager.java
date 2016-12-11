@@ -34,7 +34,7 @@ class BluetoothManager {
     private static final UUID MY_UUID = new UUID(72000001, 9);
     private static final String APP_BT_NAME = "BluetoothThroughputTest";
 
-    private static final int NUMBEROFDEVICES = 2;
+    private static final int NUMBEROFDEVICES = 3;
 
     private static final int SINGLEDATASETSIZE = 4000;
 
@@ -243,7 +243,7 @@ class BluetoothManager {
 
                     socketIndex++;
 
-                    if(socketIndex > 1) {
+                    if(socketIndex > NUMBEROFDEVICES-2) {
 
                         manageConnectedSockets(sockets);
 

@@ -132,36 +132,36 @@ public class MainActivity extends AppCompatActivity {
             TextView androidLabelTextView = ((TextView) findViewById(R.id.androidLabelTV));
             switch(msg.what) {
                 case 1:
-                    androidLabelTextView.append("Client Read Number, ");
+//                    androidLabelTextView.append("Client Read Number, ");
                     lengthRead = msg.getData().getInt("Device Name");
-                    androidConsoleTextView.append(Integer.toString(lengthRead));
+//                    androidConsoleTextView.append(Integer.toString(lengthRead));
                     break;
                 case 2:
-                    androidLabelTextView.append("Server Sent Number, ");
+//                    androidLabelTextView.append("Server Sent Number, ");
                     integerBytes = msg.getData().getByteArray("Device Name");
                     mBtManager.AssembleData(integerBytes);
-                    lengthRead = integerBytes.length;
-                    if (androidConsoleTextView.getText().toString().compareTo("Console") == 0) {
-                        androidConsoleTextView.setText("");
-                    }
-                    androidConsoleTextView.append(Integer.toString(lengthRead));
+//                    lengthRead = integerBytes.length;
+//                    if (androidConsoleTextView.getText().toString().compareTo("Console") == 0) {
+//                        androidConsoleTextView.setText("");
+//                    }
+//                    androidConsoleTextView.append(Integer.toString(lengthRead));
                     break;
                 case 3:
-                    androidLabelTextView.append("Time, ");
+                    androidLabelTextView.setText("Time: ");
                     long startTime = msg.getData().getLong("Start Time");
                     long endTime = msg.getData().getLong("End Time");
 
-                    androidConsoleTextView.append(String.valueOf(endTime - startTime));
+                    androidConsoleTextView.setText(String.valueOf(endTime - startTime));
                     break;
                 case 4:
-                    androidLabelTextView.append("Server Read Number, ");
+//                    androidLabelTextView.append("Server Read Number, ");
                     integerBytes = msg.getData().getByteArray("Device Name");
                     mBtManager.AssembleData(integerBytes);
-                    lengthRead = integerBytes.length;
-                    if (androidConsoleTextView.getText().toString().compareTo("Console") == 0) {
-                        androidConsoleTextView.setText("");
-                    }
-                    androidConsoleTextView.append(Integer.toString(lengthRead));
+//                    lengthRead = integerBytes.length;
+//                    if (androidConsoleTextView.getText().toString().compareTo("Console") == 0) {
+//                        androidConsoleTextView.setText("");
+//                    }
+//                    androidConsoleTextView.append(Integer.toString(lengthRead));
 
                     break;
             }

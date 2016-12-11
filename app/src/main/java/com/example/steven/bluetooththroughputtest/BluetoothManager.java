@@ -30,9 +30,13 @@ import java.util.UUID;
 
 class BluetoothManager {
 
-    //CONSTANT STRINGS
+    //CONSTANTS
     private static final UUID MY_UUID = new UUID(72000001, 9);
     private static final String APP_BT_NAME = "BluetoothThroughputTest";
+
+    private static final int NUMBEROFDEVICES = 2;
+
+    private static final int SINGLEDATASETSIZE = 4000;
 
     private BluetoothAdapter mBtAdapter;
     private Set<BluetoothDevice> mBtDevices;
@@ -81,11 +85,10 @@ class BluetoothManager {
         //put together data into a centralized structure, then retransmit
         mMasterData.add(data);
         dataIndex += data.length;
-        List<Byte> SortedData = new ArrayList<Byte>();
-        if (dataIndex == 12000) {
-            byte[] masterbeta = new byte[12000];
+        if (dataIndex == SINGLEDATASETSIZE*NUMBEROFDEVICES) {
+            byte[] masterbeta = new byte[SINGLEDATASETSIZE*NUMBEROFDEVICES];
             for (int i =0; i < mMasterData.size(); i++) {
-                byte[] temp = new byte[12000];
+                byte[] temp = new byte[SINGLEDATASETSIZE*NUMBEROFDEVICES];
                 if (i == 0) {
                     temp = AddArrays(mMasterData.get(i), mMasterData.get(i + 1));
                     i++;
@@ -93,22 +96,9 @@ class BluetoothManager {
                     temp = AddArrays(temp, mMasterData.get(i));
                 masterbeta = temp;
             }
-            for (int i = 0; i < masterbeta.length; i++) {
-                SortedData.add(masterbeta[i]);
-            }
-            Collections.sort(SortedData);
 
-//            mDataGatherEndTime = SystemClock.elapsedRealtime();
-//
-//            Bundle lBundle = new Bundle();
-//            lBundle.putLong("Start Time", mDataGatherStartTime);
-//            lBundle.putLong("End Time", mDataGatherEndTime);
-//
-//            int messageType = 3;
-//
-//            Message msg = mHandler.obtainMessage(messageType);
-//            msg.setData(lBundle);
-//            msg.sendToTarget();
+            Arrays.sort(masterbeta);
+
             dataIndex = 0;
 
             for (ConnectedThread lThread : mServerThreads) {
@@ -144,10 +134,10 @@ class BluetoothManager {
     }
 
     private byte[] createData() {
-        byte[] data = new byte[4000];
+        byte[] data = new byte[SINGLEDATASETSIZE];
         if(mIsServer) {
-            for(int i = 0; i < 4000; i++) {
-                data[i] = ((byte)(i*3));
+            for(int i = 0; i < SINGLEDATASETSIZE; i++) {
+                data[i] = ((byte)(i*NUMBEROFDEVICES));
             }
             //If it's the server, send this to it's own internal copy of data.
             Bundle lBundle = new Bundle();
@@ -159,8 +149,8 @@ class BluetoothManager {
             msg.sendToTarget();
         }
         else {
-            for(int i = 0; i < 4000; i++) {
-                data[i] = ((byte)(i*3+mClientNumber));
+            for(int i = 0; i < SINGLEDATASETSIZE; i++) {
+                data[i] = ((byte)(i*NUMBEROFDEVICES+mClientNumber));
             }
         }
         return data;
@@ -233,7 +223,7 @@ class BluetoothManager {
 
         public void run() {
 
-            BluetoothSocket[] sockets = new BluetoothSocket[2];
+            BluetoothSocket[] sockets = new BluetoothSocket[NUMBEROFDEVICES-1];
             int socketIndex = 0;
 
             //Wait for incoming connection request
@@ -361,7 +351,7 @@ class BluetoothManager {
 
         public void run() {
             if (mType == 0) {
-                byte[] buffer = new byte[4000];  // buffer store for the stream
+                byte[] buffer = new byte[SINGLEDATASETSIZE];  // buffer store for the stream
                 int bufferLength;
 
                 // Keep listening to the InputStream until an exception occurs
